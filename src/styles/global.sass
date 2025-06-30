@@ -1,0 +1,199 @@
+@use "colors"
+@import url('https://cdn.jsdelivr.net/gh/asboy2035/Code@Imports/css/button.css')
+@import url('https://cdn.jsdelivr.net/gh/asboy2035/Code@Imports/css/utilities.css')
+
+:root
+  --safe-area-inset-top: env(safe-area-inset-top)
+  --safe-area-inset-bottom: env(safe-area-inset-bottom)
+
+body
+  display: flex
+  flex-direction: column
+  gap: 0.7rem
+  padding: 3rem 1rem
+  margin-top: var(--safe-area-inset-top)
+  height: 100vh
+  max-width: 30rem
+  margin-left: auto /* Center the app */
+  margin-right: auto /* Center the app */
+
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif
+  background: var(--background-color)
+  color: var(--text-color)
+  overflow-y: auto /* Changed to auto to allow scrolling */
+  user-select: none
+  -webkit-user-select: none
+
+h1, h2, h3, h4, h5, h6
+  margin: 0.5rem 0
+
+label
+  opacity: 0.7
+  font-size: small
+
+input
+  background: transparent
+  color: var(--text-color)
+  border: none
+  font-size: medium
+  padding: 0.5rem 0.75rem /* Added padding for better usability */
+  border-radius: 0.75rem /* Added border-radius */
+  background: var(--foreground-color) /* Added background */
+
+a
+  color: var(--text-color)
+
+.tabBar
+  display: flex
+  position: fixed
+  gap: 0.5rem
+  align-items: center
+  padding: 0.5rem
+  bottom: 1.5rem
+  left: 50% /* Center the tab bar */
+  transform: translateX(-50%) /* Center the tab bar */
+  margin-bottom: var(--safe-area-inset-bottom)
+
+  background: var(--foreground-color)
+  border-radius: 1.25rem
+  backdrop-filter: blur(1rem)
+  -webkit-backdrop-filter: blur(1rem)
+  overflow: hidden /* Changed to hidden to prevent internal scrollbar */
+  z-index: 10
+  max-width: calc(100% - 2rem) /* Ensure it fits on smaller screens */
+  justify-content: center /* Center icons within the tab bar */
+.tabBar svg
+  height: 1.5rem
+  width: 1.5rem
+  margin: 0.5rem
+  cursor: pointer
+.tabBar > div
+  display: flex
+  align-items: center
+  justify-content: center
+  border-radius: 0.75rem
+  transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out
+.tabBar > div.selected
+  background-color: var(--accent-color)
+  box-shadow: 0 0 1.5rem var(--accent-color) /* Reduced shadow for subtlety */
+
+.progress
+  display: flex
+  align-items: center
+  position: relative
+  margin: 0.75rem 0
+  width: 100%
+  height: 2rem
+
+  background: var(--foreground-color)
+  border-radius: 2rem
+
+#progress-bar
+  height: calc(100% - 0.5rem)
+  margin-left: 0.25rem
+  max-width: calc(100% - 0.5rem)
+
+  background: var(--accent-color)
+  box-shadow: 0 0 3rem var(--accent-color)
+  border-radius: 1.75rem
+  transition: 0.3s ease-in-out
+
+.container
+  display: flex
+  flex-direction: column
+  padding: 1rem
+  gap: 0.75rem
+  margin-bottom: 0.7rem /* Added margin-bottom for spacing between containers */
+
+  background: var(--foreground-color)
+  border-radius: 1.5rem
+
+#app-updated
+  display: flex
+  position: fixed
+  justify-content: center
+  transform: translateX(-50%)
+  left: 50%
+  top: 1rem
+  max-width: 15rem
+  padding: 0.5rem
+
+  background: var(--foreground-color)
+  border-radius: 0.5rem
+  font-size: small
+  backdrop-filter: blur(10px)
+  -webkit-backdrop-filter: blur(10px)
+
+  animation: slideFadeUp 0.5s ease-in-out
+  animation-fill-mode: forwards
+  animation-delay: 1s
+
+@keyframes slideFadeUp
+  0%
+    opacity: 1
+    filter: blur(0)
+    transform: none
+  100%
+    opacity: 0
+    filter: blur(10px)
+    transform: translate(0, -100%)
+
+#congrats-message
+  color: var(--accent-color)
+  font-weight: bold
+
+.light
+  opacity: 0.7
+
+.hidden
+  display: none !important
+
+/*Notifications*/
+.notification
+  display: flex
+  position: fixed
+  flex-direction: column
+  gap: 0.75rem
+  top: 1rem
+  left: 1rem
+  width: calc(100vw - 4rem)
+  margin-top: var(--safe-area-inset-top)
+  max-width: 29rem
+  padding: 1rem
+  z-index: 11 /* Ensure notification is on top */
+
+  background: var(--foreground-color)
+  border-radius: 1.5rem
+  backdrop-filter: blur(2rem)
+  -webkit-backdrop-filter: blur(2rem)
+  animation: notification 2s ease forwards
+
+.notificationProgressBar
+  display: block
+  width: 50%
+  height: 1rem
+
+  background: var(--accent-color)
+  box-shadow: 0 0 3rem var(--accent-color)
+  border-radius: 0.5rem
+  animation: progress 2s ease forwards
+
+@keyframes progress
+  0%
+    width: 100%
+
+  100%
+    width: 0
+
+@keyframes notification
+  0%
+    transform: translateY(-100%)
+
+  30%
+    transform: none
+
+  70%
+    transform: translateY(-1%)
+
+  100%
+    transform: translateY(calc(-100% - 1rem))
