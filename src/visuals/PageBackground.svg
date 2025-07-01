@@ -9,9 +9,9 @@
     <filter id="filter2" x="0" y="0" width="4096" height="2304" filterUnits="userSpaceOnUse" primitiveUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
         <feGaussianBlur stdDeviation="50"/>
     </filter>
-    <path id="Oval-copy" fill="#ee5fa7" fill-rule="evenodd" stroke="none" opacity="0.802432" filter="url(#filter2)" d="M 3079 2343.5 C 3079 1740.681152 2601.063965 1252 2011.5 1252 C 1421.936035 1252 944 1740.681152 944 2343.5 C 944 2946.318848 1421.936035 3435 2011.5 3435 C 2601.063965 3435 3079 2946.318848 3079 2343.5 Z"/>
+    <path id="Oval-copy" fill="#1ee5ce" fill-rule="evenodd" stroke="none" opacity="0.802432" filter="url(#filter2)" d="M 3079 2343.5 C 3079 1740.681152 2601.063965 1252 2011.5 1252 C 1421.936035 1252 944 1740.681152 944 2343.5 C 944 2946.318848 1421.936035 3435 2011.5 3435 C 2601.063965 3435 3079 2946.318848 3079 2343.5 Z"/>
     <filter id="filter3" x="0" y="0" width="4096" height="2304" filterUnits="userSpaceOnUse" primitiveUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
         <feGaussianBlur stdDeviation="50"/>
     </filter>
-    <path id="Oval-copy-2" fill="#f7ba00" fill-rule="evenodd" stroke="none" opacity="0.797117" filter="url(#filter3)" d="M 1474 1212.5 C 1474 609.681152 996.063965 121 406.5 121 C -183.063965 121 -661 609.681152 -661 1212.5 C -661 1815.318848 -183.063965 2304 406.5 2304 C 996.063965 2304 1474 1815.318848 1474 1212.5 Z"/>
+    <path id="Oval-copy-2" fill="#00a1fe" fill-rule="evenodd" stroke="none" opacity="0.797117" filter="url(#filter3)" d="M 1474 1212.5 C 1474 609.681152 996.063965 121 406.5 121 C -183.063965 121 -661 609.681152 -661 1212.5 C -661 1815.318848 -183.063965 2304 406.5 2304 C 996.063965 2304 1474 1815.318848 1474 1212.5 Z"/>
 </svg>

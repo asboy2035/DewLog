@@ -1,12 +1,20 @@
 <template>
   <div class="settings-view">
-    <div class="container">
+    <card>
       <h2>Drink Reminders</h2>
-      <button @click="requestNotificationPermission">Enable Notifications</button>
+      <button @click="requestNotificationPermission">
+        <Icon icon="solar:bell-line-duotone" />
+        Enable Notifications
+      </button>
+
       <div class="reminder-input">
         <input type="time" v-model="newReminderTime">
-        <button @click="addReminder">Add Reminder</button>
+        <button @click="addReminder">
+          <Icon icon="solar:add-circle-line-duotone" />
+          Add Reminder
+        </button>
       </div>
+
       <ul class="reminders-list">
         <li v-for="(reminder, index) in hydrationStore.reminders" :key="index">
           <span>{{ reminder.time }}</span>
@@ -17,20 +25,44 @@
         </li>
         <li v-if="hydrationStore.reminders.length === 0">No reminders set.</li>
       </ul>
-    </div>
+    </card>
 
-    <div class="container">
+    <card>
+      <h2>Smart Mode Notifications</h2>
+      <div class="smart-mode-toggle">
+        <span>Enable Smart Reminders (Every 2 hours, 8 AM - 8 PM)</span>
+        <label class="switch">
+          <input type="checkbox" v-model="hydrationStore.smartModeEnabled" @change="hydrationStore.toggleSmartMode">
+          <span class="slider round"></span>
+        </label>
+      </div>
+    </card>
+
+    <card>
       <h2>Data Management</h2>
-      <button @click="exportData">Export Data (JSON)</button>
-      <label for="import-file" class="file-input-label">Import Data (JSON)</label>
-      <input type="file" id="import-file" @change="handleImport" accept="application/json">
-    </div>
+
+      <div class="flexRow spaced">
+        <button @click="exportData">
+          <Icon icon="solar:square-share-line-line-duotone" />
+          Export Data (JSON)
+        </button>
+        <label for="import-file" class="file-input-label">
+          <button @click="exportData">
+            <Icon icon="solar:download-line-duotone" />
+            Import Data
+          </button>
+        </label>
+        <input type="file" id="import-file" @change="handleImport" accept="application/json">
+      </div>
+    </card>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { useHydrationStore } from '../stores/hydration.js';
+import { ref } from 'vue'
+import { useHydrationStore } from '../stores/hydration.ts'
+import { Icon } from '@iconify/vue'
+import Card from '../components/Card.vue'
 
 const hydrationStore = useHydrationStore();
 const newReminderTime = ref('08:00'); // Default reminder time
@@ -105,21 +137,84 @@ const handleImport = (event) => {
 }
 
 .file-input-label {
-  display: inline-block;
-  padding: 0.5rem 0.75rem;
-  font-size: medium;
-  background: var(--foreground-color);
-  color: var(--text-color);
-  border: none;
-  cursor: pointer;
-  border-radius: 0.75rem;
-  transition: 0.2s ease-in-out;
-  backdrop-filter: blur(1rem);
-  -webkit-backdrop-filter: blur(1rem);
-  margin-top: 1rem;
+  opacity: 1;
 }
 
 #import-file {
   display: none; /* Hide the actual file input */
+}
+
+/* Styles for the toggle switch */
+.smart-mode-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 1rem;
+  padding: 0.5rem 0;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 24px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: var(--primary-color);
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px var(--primary-color);
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(16px);
+  -ms-transform: translateX(16px);
+  transform: translateX(16px);
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 24px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+.settings-view {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 </style>

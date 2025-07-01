@@ -3,10 +3,10 @@ import { defineStore } from 'pinia'
 export const useHydrationStore = defineStore('hydration', {
   state: () => ({
     dailyGoal: 8,
-    hydrationProgress: 0,
+    hydrationProgress: 0, // Today's progress
     streak: 0,
     dailyStats: {}, // Stores daily hydration progress: { 'YYYY-MM-DD': cups }
-    lastLoggedDay: '',
+    lastLoggedDay: '', // The last day for which progress was recorded
     drinks: {
       "Water": 1.0,
       "Juice": 0.95,
@@ -28,24 +28,63 @@ export const useHydrationStore = defineStore('hydration', {
     },
     notification: null, // { message: '', color: '', timeout: 0 }
     reminders: [], // Array of { time: 'HH:MM', enabled: true }
+    selectedDay: '', // The day currently selected in HomeView for history
+    smartModeEnabled: false,
+    _reminderInterval: null, // Interval ID for custom reminders
+    _smartReminderInterval: null, // Interval ID for smart reminders
+    _lastNotificationTime: 0, // To prevent multiple notifications within the same minute
   }),
   getters: {
-    // Calculate the percentage of daily goal achieved
+    // Calculate the percentage of daily goal achieved for today
     progressPercentage: (state) => {
       return Math.min((state.hydrationProgress / state.dailyGoal) * 100, 100)
     },
-    // Check if the daily goal has been met
+    // Check if today's daily goal has been met
     goalMet: (state) => {
       return state.hydrationProgress >= state.dailyGoal
     },
-    // Get formatted daily stats for display
+    // Get formatted daily stats for display, sorted by date descending
     formattedDailyStats: (state) => {
       return Object.keys(state.dailyStats)
-        .sort((a, b) => new Date(b) - new Date(a)) // Sort by date descending
+        .sort((a, b) => new Date(b) - new Date(a))
         .map(date => ({
           date: date,
           amount: state.dailyStats[date]
         }))
+    },
+    // Get progress for the selected day
+    selectedDayProgress: (state) => {
+      return state.dailyStats[state.selectedDay] || 0
+    },
+    // Calculate the percentage for the selected day
+    selectedDayProgressPercentage: (state) => {
+      const progress = state.dailyStats[state.selectedDay] || 0;
+      return Math.min((progress / state.dailyGoal) * 100, 100);
+    },
+    // Check if the selected day's goal has been met
+    selectedDayGoalMet: (state) => {
+      const progress = state.dailyStats[state.selectedDay] || 0;
+      return progress >= state.dailyGoal;
+    },
+    // Check if the currently selected day is today
+    isTodaySelected: (state) => {
+      return state.selectedDay === new Date().toLocaleDateString();
+    },
+    // Get the last 7 days for history display in HomeView
+    recentDays: (state) => {
+      const days = [];
+      const today = new Date();
+      for (let i = 0; i < 7; i++) {
+        const d = new Date(today);
+        d.setDate(today.getDate() - i);
+        const dateString = d.toLocaleDateString();
+        days.push({
+          date: dateString,
+          displayDate: i === 0 ? 'Today' : dateString,
+          amount: state.dailyStats[dateString]
+        });
+      }
+      return days;
     }
   },
   actions: {
@@ -57,9 +96,15 @@ export const useHydrationStore = defineStore('hydration', {
       this.dailyStats = JSON.parse(localStorage.getItem('dailyStats')) || {}
       this.lastLoggedDay = localStorage.getItem('lastLoggedDay') || new Date().toLocaleDateString()
       this.reminders = JSON.parse(localStorage.getItem('reminders')) || []
+      this.selectedDay = localStorage.getItem('selectedDay') || new Date().toLocaleDateString()
+      this.smartModeEnabled = JSON.parse(localStorage.getItem('smartModeEnabled')) || false;
 
-      this.resetDailyProgress()
-      this.scheduleReminders()
+
+      // Check and update streak based on previous day's data
+      this.checkStreak();
+      // Ensure hydrationProgress is correct for today
+      this.resetDailyProgress();
+      this.scheduleReminders();
     },
 
     // Save state to localStorage
@@ -70,6 +115,8 @@ export const useHydrationStore = defineStore('hydration', {
       localStorage.setItem('dailyStats', JSON.stringify(this.dailyStats))
       localStorage.setItem('lastLoggedDay', this.lastLoggedDay)
       localStorage.setItem('reminders', JSON.stringify(this.reminders))
+      localStorage.setItem('selectedDay', this.selectedDay)
+      localStorage.setItem('smartModeEnabled', JSON.stringify(this.smartModeEnabled));
     },
 
     // Log a drink
@@ -79,10 +126,14 @@ export const useHydrationStore = defineStore('hydration', {
         return
       }
 
-      this.resetDailyProgress() // Ensure daily reset before logging
+      // Ensure daily reset and streak check before logging for today
+      this.resetDailyProgress();
+
       this.hydrationProgress += amount * this.drinks[drinkType]
+      this.updateDailyStats(new Date().toLocaleDateString(), this.hydrationProgress); // Update today's stats
+
       this.saveState()
-      this.updateDailyStats() // Update daily stats after logging
+      this.showNotification(`Logged ${amount} cups of ${drinkType}!`, '#25be4d', 2);
     },
 
     // Update daily goal
@@ -95,23 +146,44 @@ export const useHydrationStore = defineStore('hydration', {
     resetDailyProgress() {
       const currentDate = new Date().toLocaleDateString()
       if (currentDate !== this.lastLoggedDay) {
-        if (this.hydrationProgress < this.dailyGoal) {
-          this.streak = 0 // Reset streak if goal wasn't met
-        } else {
-          this.streak += 1 // Increment streak if goal was met
-        }
+        // If it's a new day, update streak based on the *previous* day's performance
+        this.checkStreak();
 
-        this.hydrationProgress = 0 // Reset hydration progress
-        this.lastLoggedDay = currentDate // Update last logged day
-        this.saveState()
+        // Reset hydration progress for the new day
+        this.hydrationProgress = 0;
+        this.lastLoggedDay = currentDate; // Update last logged day
+        this.saveState();
       }
     },
 
-    // Update daily stats (for the stats page)
-    updateDailyStats() {
-      const today = new Date().toLocaleDateString()
-      this.dailyStats[today] = this.hydrationProgress
+    // Check and update the streak
+    checkStreak() {
+      const currentDate = new Date().toLocaleDateString();
+      // Only check streak if lastLoggedDay is actually a previous day
+      if (this.lastLoggedDay && this.lastLoggedDay !== currentDate) {
+        const previousDayProgress = this.dailyStats[this.lastLoggedDay] || 0;
+        if (previousDayProgress >= this.dailyGoal) {
+          this.streak += 1; // Increment streak if goal was met on the previous day
+        } else {
+          this.streak = 0; // Reset streak if goal was not met
+        }
+      } else if (!this.lastLoggedDay) {
+        // If no lastLoggedDay, it's the first time running or data cleared, streak is 0
+        this.streak = 0;
+      }
+      this.saveState();
+    },
+
+    // Update daily stats for a specific day
+    updateDailyStats(date, amount) {
+      this.dailyStats[date] = amount
       this.saveState()
+    },
+
+    // Set the selected day for history view
+    setSelectedDay(date) {
+      this.selectedDay = date;
+      this.saveState();
     },
 
     // Show a custom notification
@@ -133,8 +205,6 @@ export const useHydrationStore = defineStore('hydration', {
       const permission = await Notification.requestPermission()
       if (permission === 'granted') {
         this.showNotification('Notification permission granted!', '#25be4d', 3)
-        // Subscribe for push notifications (if needed for server-side pushes)
-        // This example focuses on client-side scheduled notifications
       } else {
         this.showNotification('Notification permission denied.', 'red', 3)
       }
@@ -169,14 +239,41 @@ export const useHydrationStore = defineStore('hydration', {
       this.showNotification('Reminder removed!', 'orange', 3)
     },
 
+    // Toggle Smart Mode for notifications
+    toggleSmartMode() {
+      this.smartModeEnabled = !this.smartModeEnabled;
+      this.saveState();
+      this.scheduleReminders(); // Reschedule all reminders based on new smart mode status
+      this.showNotification(`Smart Mode ${this.smartModeEnabled ? 'Enabled' : 'Disabled'}!`, 'cyan', 3);
+    },
+
     // Schedule client-side push notifications for reminders
     scheduleReminders() {
-      // Clear any existing reminders to avoid duplicates
+      // Clear any existing reminder intervals to avoid duplicates
       if (this._reminderInterval) {
         clearInterval(this._reminderInterval)
       }
+      if (this._smartReminderInterval) {
+        clearInterval(this._smartReminderInterval)
+      }
 
-      // Schedule new reminders
+      // Function to send a notification
+      const sendNotification = (title, body) => {
+        if (Notification.permission === 'granted') {
+          const now = new Date();
+          // Prevent multiple notifications within the same minute
+          if (!this._lastNotificationTime || (now.getTime() - this._lastNotificationTime > 59 * 1000)) {
+            new Notification(title, {
+              body: body,
+              icon: '/Hydration-logo.jpg', // Ensure this path is correct
+              vibrate: [200, 100, 200]
+            });
+            this._lastNotificationTime = now.getTime();
+          }
+        }
+      };
+
+      // Schedule custom reminders
       this._reminderInterval = setInterval(() => {
         const now = new Date()
         const currentHour = now.getHours().toString().padStart(2, '0')
@@ -185,18 +282,29 @@ export const useHydrationStore = defineStore('hydration', {
 
         this.reminders.forEach(reminder => {
           if (reminder.enabled && reminder.time === currentTime) {
-            // Check if notification has been sent recently to avoid multiple notifications within the same minute
-            if (!this._lastNotificationTime || (now.getTime() - this._lastNotificationTime > 59 * 1000)) {
-              new Notification('Hydration Reminder', {
-                body: 'Time to drink some water!',
-                icon: '/Hydration-logo.jpg',
-                vibrate: [200, 100, 200]
-              })
-              this._lastNotificationTime = now.getTime()
-            }
+            sendNotification('Hydration Reminder', 'Time to drink some water!');
           }
         })
       }, 60 * 1000) // Check every minute
+
+      // Schedule smart mode reminders if enabled
+      if (this.smartModeEnabled) {
+        // Define smart reminder times (e.g., every 2 hours from 8 AM to 8 PM)
+        const smartTimes = [
+          '08:00', '10:00', '12:00', '14:00', '16:00', '18:00', '20:00'
+        ];
+
+        this._smartReminderInterval = setInterval(() => {
+          const now = new Date();
+          const currentHour = now.getHours().toString().padStart(2, '0');
+          const currentMinute = now.getMinutes().toString().padStart(2, '0');
+          const currentTime = `${currentHour}:${currentMinute}`;
+
+          if (smartTimes.includes(currentTime)) {
+            sendNotification('Smart Hydration Reminder', 'It\'s a good time for a drink!');
+          }
+        }, 60 * 1000); // Check every minute
+      }
     },
 
     // Export all data to a JSON file
@@ -208,6 +316,7 @@ export const useHydrationStore = defineStore('hydration', {
         dailyStats: this.dailyStats,
         lastLoggedDay: this.lastLoggedDay,
         reminders: this.reminders,
+        smartModeEnabled: this.smartModeEnabled,
       }
       const dataStr = JSON.stringify(data, null, 2)
       const blob = new Blob([dataStr], { type: 'application/json' })
@@ -234,6 +343,7 @@ export const useHydrationStore = defineStore('hydration', {
           this.hydrationProgress = importedData.hydrationProgress !== undefined ? importedData.hydrationProgress : this.hydrationProgress
           this.streak = importedData.streak !== undefined ? importedData.streak : this.streak
           this.lastLoggedDay = importedData.lastLoggedDay !== undefined ? importedData.lastLoggedDay : this.lastLoggedDay
+          this.smartModeEnabled = importedData.smartModeEnabled !== undefined ? importedData.smartModeEnabled : this.smartModeEnabled;
 
           // Merge dailyStats: combine entries, prioritizing imported if dates overlap
           if (importedData.dailyStats) {
