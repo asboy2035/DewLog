@@ -1,5 +1,6 @@
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
+import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 import App from './App.vue'
 import '@/styles/global.sass'
 
@@ -7,6 +8,9 @@ import '@/styles/global.sass'
 const hydroFlowApp = createApp(App)
 // Create the Pinia store instance
 const pinia = createPinia()
+
+pinia
+  .use(piniaPluginPersistedstate)
 
 hydroFlowApp
   .use(pinia)

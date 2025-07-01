@@ -1,5 +1,5 @@
 <template>
-  <div class="stats-view">
+  <div class="statsView">
     <card>
       <h2>Your Streak</h2>
       <p id="streak-info">You are on a {{ hydrationStore.streak }}-day streak.</p>
@@ -24,15 +24,8 @@
 </template>
 
 <script setup>
-import { useHydrationStore } from '../stores/hydration.ts'
-import Card from '../components/Card.vue'
+  import { useHydrationStore } from '@/stores/hydration.ts'
+  import Card from '@/components/Card.vue'
 
-const hydrationStore = useHydrationStore();
+  const hydrationStore = useHydrationStore()
 </script>
-
-<style scoped lang="sass">
-  .stats-view
-    display: flex
-    flex-direction: column
-    gap: 0.5rem
-</style>

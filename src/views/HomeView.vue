@@ -36,7 +36,7 @@
         <label for="drink-type">Drink Type:</label>
         <select id="drink-type" v-model="selectedDrinkType">
           <option v-for="(multiplier, drink) in hydrationStore.drinks" :key="drink" :value="drink">
-            {{ drink }}
+            {{ drink }} ({{multiplier}}x)
           </option>
         </select>
       </div>
@@ -64,7 +64,7 @@
 
 <script setup>
   import { ref, onMounted } from 'vue'
-  import { useHydrationStore } from '../stores/hydration.ts'
+  import { useHydrationStore } from '@/stores/hydration.ts'
   import Card from "@/components/Card.vue"
   import {Icon} from '@iconify/vue'
 
@@ -85,17 +85,12 @@
 
   // Ensure the selectedDay is set to today when the component mounts
   onMounted(() => {
-    hydrationStore.setSelectedDay(new Date().toLocaleDateString())
+    hydrationStore.setSelectedDay(new Date().toISOString().split('T')[0])
   })
 </script>
 
 <style scoped lang="sass">
   @use "../styles/colors"
-
-  .homeView
-    display: flex
-    flex-direction: column
-    gap: 1rem
 
   .dailyHistory
     display: flex
