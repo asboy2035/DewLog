@@ -12,7 +12,7 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'pwa-icon.png', 'apple-touch-icon.png', 'PageBackground.svg'],
       manifest: {
-        name: 'ash + Vue App',
+        name: 'DewLog',
         short_name: 'ash + Vue',
         start_url: '/',
         display: 'standalone',
