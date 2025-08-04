@@ -85,10 +85,8 @@
         :class="{ 'light': !hydrationStore.selectedDayGoalMet }"
       >
         You've drank
-        {{ hydrationStore.selectedDayProgressPercentage.toFixed(1) }}%
-        of your goal
-
-        <span v-if="!hydrationStore.isTodaySelected">on {{ hydrationStore.selectedDay }}</span>.
+        {{ hydrationStore.selectedDayProgressPercentage.toFixed(1).replace('.0', '') }}%
+        of your goal<span v-if="!hydrationStore.isTodaySelected"> on {{ hydrationStore.selectedDay }}</span>.
       </p>
 
       <p
@@ -171,6 +169,7 @@
       border-radius: 1.25rem
       background: linear-gradient(to bottom right, colors.$swirly01, colors.$swirly02)
       height: 100%
+      transition: 0.3s ease
 
   #congratsMessage
     color: colors.$accentColor

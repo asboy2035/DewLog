@@ -27,10 +27,10 @@ export const useHydrationStore: StoreDefinition = defineStore('hydration', () =>
   const _reminderInterval: Ref = ref<number | null>(null)
   const _smartReminderInterval: Ref = ref<number | null>(null)
   const _lastNotificationTime: Ref = ref<number>(0)
-  const formattedDailyStats = computed(() =>
+  const formattedDailyStats: ComputedRef = computed(() =>
     Object.keys(dailyStats)
-      .sort((a, b) => new Date(b).getTime() - new Date(a).getTime())
-      .map(date => ({
+      .sort((a: string, b: string) => new Date(b).getTime() - new Date(a).getTime())
+      .map((date: string) => ({
         date,
         amount: dailyStats[date]
       }))
@@ -103,44 +103,40 @@ export const useHydrationStore: StoreDefinition = defineStore('hydration', () =>
   // Actions
   function logDrink(drinkType: DrinkType, amount: number): void {
     if (isNaN(amount) || amount <= 0) {
-      showNotification('Please enter a valid amount!', 'red', 3)
+      showNotification('Please enter a valid amount!', 'red')
       return
     }
     resetDailyProgress()
     hydrationProgress.value += amount * (drinks[drinkType] ?? 1)
     dailyStats[getTodayDate()] = hydrationProgress.value
-    showNotification(`Logged ${amount} cups of ${drinkType}!`, '#25be4d', 2)
+    showNotification(`Logged ${amount} cups of ${drinkType}!`, '#25be4d')
   }
 
   async function requestNotificationPermission(): Promise<void> {
     if (!('Notification' in window)) {
-      showNotification('This browser does not support notifications.', 'red', 3)
+      showNotification('This browser does not support notifications.', 'red')
       return
     }
     const permission: NotificationPermission = await Notification.requestPermission()
     if (permission === 'granted') {
-      showNotification('Notification permission granted!', '#25be4d', 3)
+      showNotification('Notification permission granted!', '#25be4d')
     } else {
-      showNotification('Notification permission denied.', 'red', 3)
+      showNotification('Notification permission denied.', 'red')
     }
   }
 
   function showNotification(
     message: string,
     color: string = 'cyan',
-    timeout: number = 2
+    timeout: number = 3
   ): void {
     notification.value = { message, color, timeout }
-
-    setTimeout((): void => {
-      notification.value = null
-    }, timeout * 1000)
   }
 
   function toggleSmartMode(): void {
     smartModeEnabled.value = !smartModeEnabled.value
     scheduleReminders()
-    showNotification(`Smart Mode ${smartModeEnabled.value ? 'Enabled' : 'Disabled'}!`, 'cyan', 3)
+    showNotification(`Smart Mode ${smartModeEnabled.value ? 'Enabled' : 'Disabled'}!`)
   }
 
   function setSelectedDay(date: string): void {
@@ -214,13 +210,13 @@ export const useHydrationStore: StoreDefinition = defineStore('hydration', () =>
 
   function addReminder(time: string): void {
     if (reminders.value.some((r: Reminder): boolean => r.time === time)) {
-      showNotification('Reminder at this time already exists!', 'orange', 3)
+      showNotification('Reminder at this time already exists!', 'orange')
       return
     }
     reminders.value.push({ time, enabled: true })
     reminders.value.sort((a: Reminder, b: Reminder) => a.time.localeCompare(b.time))
     scheduleReminders()
-    showNotification(`Reminder set for ${time}!`, '#25be4d', 3)
+    showNotification(`Reminder set for ${time}!`, '#25be4d')
   }
 
   function toggleReminder(index: number): void {
@@ -228,13 +224,13 @@ export const useHydrationStore: StoreDefinition = defineStore('hydration', () =>
     if (!reminder) return
     reminder.enabled = !reminder.enabled
     scheduleReminders()
-    showNotification(`Reminder ${reminder.enabled ? 'enabled' : 'disabled'}!`, 'cyan', 3)
+    showNotification(`Reminder ${reminder.enabled ? 'enabled' : 'disabled'}!`)
   }
 
   function removeReminder(index: number): void {
     reminders.value.splice(index, 1)
     scheduleReminders()
-    showNotification('Reminder removed!', 'orange', 3)
+    showNotification('Reminder removed!', 'orange')
   }
 
   function exportData(): void {
@@ -257,7 +253,7 @@ export const useHydrationStore: StoreDefinition = defineStore('hydration', () =>
     DownloaderA.click()
     document.body.removeChild(DownloaderA)
     URL.revokeObjectURL(url)
-    showNotification('Data exported successfully!', '#25be4d', 3)
+    showNotification('Data exported successfully!', '#25be4d')
   }
 
   function importData(file: File) {
@@ -291,10 +287,10 @@ export const useHydrationStore: StoreDefinition = defineStore('hydration', () =>
         }
 
         scheduleReminders()
-        showNotification('Data imported and merged successfully!', '#25be4d', 3)
+        showNotification('Data imported and merged successfully!', '#25be4d')
       } catch (error) {
         console.error('Import error:', error)
-        showNotification('Failed to import data. Invalid file.', 'red', 3)
+        showNotification('Failed to import data. Invalid file.', 'red')
       }
     }
     reader.readAsText(file)

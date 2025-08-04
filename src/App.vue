@@ -1,5 +1,6 @@
 <script setup lang="ts">
   import { ProgressiveBlur } from 'vue-progressive-blur'
+  import Notification from '@/components/premade/Notification.vue'
 </script>
 
 <template>
@@ -9,6 +10,8 @@
     src="/PageBackground.svg"
     alt="Background" aria-hidden="true"
   />
+
+  <Notification />
 
   <RouterView />
 
