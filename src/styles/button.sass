@@ -1,0 +1,71 @@
+@use "colors"
+@use "fonts"
+
+button
+  --buttonRadius: 1rem
+  display: flex
+  align-items: center
+  justify-content: center
+  gap: 0.5rem
+
+  border: none
+  border-radius: var(--buttonRadius)
+  background: colors.$foregroundColor
+  font-family: fonts.$global
+  font-size: medium
+  color: colors.$textColor
+  padding: 0.5rem 0.75rem
+  cursor: pointer
+  transition: 0.2s ease-in-out
+  backdrop-filter: blur(2rem) saturate(150%)
+
+  &:not(.transparent)::after
+    content: ""
+    position: absolute
+    top: 0
+    bottom: 0
+    right: 0
+    left: 0
+
+    border-radius: var(--buttonRadius)
+    border: 0.1rem solid colors.$shadowColor
+    box-shadow: 0 0.5rem 0.5rem colors.$shadowColor
+    transition: 0.2s ease-in-out
+    opacity: 0.1
+
+  &:hover::after
+    box-shadow: 0 0 0.75rem colors.$shadowColor
+    opacity: 0.3
+
+  &:active::after
+    box-shadow: 0 0 0.5rem colors.$shadowColor
+
+  &:disabled
+    opacity: 0.7
+    cursor: not-allowed
+
+  &:has(svg)
+    padding: 0.75rem
+
+  svg
+    width: 1.5rem !important
+    height: 1.5rem !important
+
+  &:has(img)
+    padding: 0.5rem 0.75rem 0.5rem 0.5rem
+
+  img
+    width: 2rem
+    height: 2rem
+    border-radius: 0.75rem
+
+  &.transparent
+    padding: 0
+
+    svg
+      width: 1rem !important
+      height: 1rem !important
+
+@media (max-width: 35rem)
+  button
+    --buttonRadius: 1.25rem

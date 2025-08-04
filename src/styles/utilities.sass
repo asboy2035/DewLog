@@ -1,0 +1,60 @@
+@use "colors"
+
+// Layout
+.noMargins
+  margin: 0
+
+.fullWidth
+  width: 100%
+
+.edgeToEdge
+  padding: 0
+
+.scrollable
+  overflow: scroll
+
+// Spacing
+.spaced
+  gap: 0.5rem
+
+.tight
+  gap: 0.5rem
+
+.autoSpace
+  justify-content: space-between
+
+// Flexbox
+.centered
+  display: flex
+  align-items: center
+
+// Visibility
+.hidden
+  display: none !important
+
+.light
+  opacity: 0.6
+
+// Style & Effects
+.transparent
+  background: transparent
+  backdrop-filter: none
+  box-shadow: none
+
+.prominentLink
+  text-decoration: underline
+  text-decoration-color: colors.$accentColor
+
+// Extras
+.bigAvatar
+  width: 4rem !important
+  height: 4rem !important
+
+// Conditional Schemes
+@media (prefers-color-scheme: light)
+  .hiddenLight
+    display: none !important
+
+@media (prefers-color-scheme: dark)
+  .hiddenDark
+    display: none !important

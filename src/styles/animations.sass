@@ -1,0 +1,87 @@
+@keyframes pulse
+  0%
+    opacity: 1
+
+  50%
+    opacity: 0.6
+
+  100%
+    opacity: 1
+
+
+@keyframes swirly
+  0%
+    background-position: 0 0
+  25%
+    background-position: 100% 0
+  50%
+    background-position: 100% 100%
+  75%
+    background-position: 0 100%
+  100%
+    background-position: 0 0
+
+
+@keyframes blurIn
+  0%
+    opacity: 0.5
+    filter: blur(0.5rem)
+  100%
+    opacity: 1
+    filter: none
+
+
+.spinIn
+  animation: spinIn 0.3s ease forwards
+
+@keyframes spinIn
+  0%
+    transform: rotate(90deg)
+
+  100%
+    transform: none
+
+
+.growIn
+  animation: growIn 0.2s ease forwards
+
+@keyframes growIn
+  0%
+    transform: scale(0)
+
+  100%
+    transform: scale(1)
+
+
+@keyframes slideIn
+  0%
+    transform: scale(0.8) translateY(-50%)
+  100%
+    transform: scale(1) translateY(-100%)
+
+.fadeIn
+  animation: fadeIn 0.3s ease forwards
+
+@keyframes fadeIn
+  0%
+    opacity: 0
+  100%
+    opacity: 1
+
+.attention
+  animation: attention 1s ease infinite
+
+@keyframes attention
+  0%
+    transform: scale(1)
+  50%
+    transform: scale(1.2)
+  100%
+    transform: scale(1)
+
+@keyframes scaleIn
+  0%
+    scale: 0.2
+
+  100%
+    scale: 1
