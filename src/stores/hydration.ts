@@ -296,6 +296,13 @@ export const useHydrationStore: StoreDefinition = defineStore('hydration', () =>
     reader.readAsText(file)
   }
 
+  function getDayData(date: string): { total: number } | null {
+    if (dailyStats[date]) {
+      return { total: dailyStats[date] };
+    }
+    return null;
+  }
+
   return {
     // State
     dailyGoal,
@@ -339,6 +346,7 @@ export const useHydrationStore: StoreDefinition = defineStore('hydration', () =>
     removeReminder,
     exportData,
     importData,
+    getDayData,
   }
 }, {
   persist: true

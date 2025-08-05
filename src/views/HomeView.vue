@@ -1,7 +1,7 @@
 <script setup>
   import { ref, onMounted } from 'vue'
   import { useHydrationStore } from '@/stores/hydration.ts'
-  import {Icon} from '@iconify/vue'
+  import { Icon } from '@iconify/vue'
   import NavBar from '@/components/premade/navbar/NavBar.vue'
   import ContentView from '@/components/navigation/ContentView.vue'
   import NavigationTitle from '@/components/navigation/NavigationTitle.vue'
@@ -10,6 +10,11 @@
   import CardTitle from '@/components/layout/CardTitle.vue'
   import Modal from '@/components/layout/Modal.vue'
   import Card from '@/components/layout/Card.vue'
+  import CalendarView from '@/components/premade/CalendarView.vue'
+  import MotivationalMessage from '@/components/premade/MotivationalMessage.vue'
+  import QuickLog from '@/components/premade/QuickLog.vue'
+  import AboutCard from '@/components/premade/AboutCard.vue'
+  import Grid from '@/components/layout/Grid.vue'
 
   const hydrationStore = useHydrationStore()
 
@@ -66,36 +71,45 @@
       v-model.number="hydrationStore.dailyGoal"
     >
 
-    <!-- Display progress for the selected day -->
-    <Card class="spaced">
-      <CardTitle
-        title="Progress"
-        icon="solar:chart-2-line-duotone"
-      />
-
-      <div id="progressContainer">
-        <div
-          id="progressBar"
-          :style="{ width: hydrationStore.selectedDayProgressPercentage + '%' }"
+    <Grid class="spaced">
+      <!-- Display progress for the selected day -->
+      <Card class="spaced autoSpace">
+        <CardTitle
+          title="Progress"
+          icon="solar:chart-2-line-duotone"
         />
-      </div>
 
-      <p
-        id="progressText"
-        :class="{ 'light': !hydrationStore.selectedDayGoalMet }"
-      >
-        You've drank
-        {{ hydrationStore.selectedDayProgressPercentage.toFixed(1).replace('.0', '') }}%
-        of your goal<span v-if="!hydrationStore.isTodaySelected"> on {{ hydrationStore.selectedDay }}</span>.
-      </p>
+        <VStack class="fullWidth">
+          <div id="progressContainer">
+            <div
+              id="progressBar"
+              :style="{ width: hydrationStore.selectedDayProgressPercentage + '%' }"
+            />
+          </div>
 
-      <p
-        id="congratsMessage"
-        v-if="hydrationStore.selectedDayGoalMet"
-      >
-        You’ve reached your goal!
-      </p>
-    </Card>
+          <p
+            id="progressText"
+            :class="{ 'light': !hydrationStore.selectedDayGoalMet }"
+          >
+            You've drank
+            {{ hydrationStore.selectedDayProgressPercentage.toFixed(1).replace('.0', '') }}%
+            of your goal<span v-if="!hydrationStore.isTodaySelected">&nbsp;on {{ hydrationStore.selectedDay }}</span>.
+          </p>
+
+          <p
+            id="congratsMessage"
+            v-if="hydrationStore.selectedDayGoalMet"
+          >
+            You’ve reached your goal!
+          </p>
+        </VStack>
+      </Card>
+      <QuickLog />
+    </Grid>
+
+    <MotivationalMessage />
+    <CalendarView />
+    <AboutCard />
 
     <Modal v-if="showingLogModal">
       <CardTitle
@@ -150,16 +164,12 @@
 
     &:hover
       background: var(--accentColor)
-      scale: 1
-
-    &:active
-      scale: 1
 
   #progressContainer
     display: flex
     flex-direction: row
     justify-content: flex-start
-    width: 100%
+    width: calc(100% - 0.5rem)
     height: 1.5rem
     border-radius: 1.5rem
     padding: 0.25rem

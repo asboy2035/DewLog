@@ -30,14 +30,20 @@
         <h2>{{ hydrationStore.notification.message }}</h2>
 
         <div id="notificationProgressContainer">
-          <div
-            id="notificationProgressBar"
-            :style="{
-              animationDuration: hydrationStore.notification.timeout + 's',
-              backgroundColor: hydrationStore.notification.color,
-              boxShadow: '0 0 3rem ' + hydrationStore.notification.color
-            }"
-          />
+          <div id="notificationProgressContainerInner">
+            <div
+              id="notificationProgressBar"
+              :style="{
+                animationDuration: hydrationStore.notification.timeout + 's',
+                backgroundColor: hydrationStore.notification.color,
+                boxShadow: '0 0 3rem ' + hydrationStore.notification.color
+              }"
+            />
+            <div
+              id="notificationProgressBarBackground"
+              :style="{ animationDuration: hydrationStore.notification.timeout + 's' }"
+            />
+          </div>
         </div>
       </VStack>
     </Card>
@@ -62,20 +68,35 @@
 
       #notificationProgressContainer
         display: flex
-        flex-direction: row
-        justify-content: flex-start
         width: 100%
         height: 1.5rem
         border-radius: 1.5rem
         padding: 0.25rem
         background: colors.$foregroundColor
 
-        #notificationProgressBar
-          animation: progress forwards
-          border-radius: 1.25rem
-          mask: linear-gradient(to bottom right, black, black, rgba(0, 0, 0, 0.4))
+        #notificationProgressContainerInner
+          position: relative
+          flex-direction: row
+          justify-content: flex-start
+          width: 100%
           height: 100%
-          transition: 0.3s ease
+          border-radius: 1.5rem
+          overflow: hidden
+
+          #notificationProgressBar, #notificationProgressBarBackground
+            position: absolute
+            animation: progress forwards
+            border-radius: 1.25rem
+            height: 100%
+            transition: 0.3s ease
+
+          #notificationProgressBar
+            mask: linear-gradient(to bottom right, black, black, rgba(0, 0, 0, 0.4))
+            z-index: 110
+
+          #notificationProgressBarBackground
+            background: colors.$accentColor
+            z-index: 109
 
   @keyframes progress
     0%

@@ -12,12 +12,6 @@
     />
 
     <NavigationButton
-      link="/stats"
-      icon="solar:pie-chart-line-duotone"
-      text="Stats"
-    />
-
-    <NavigationButton
       link="/settings"
       icon="solar:settings-line-duotone"
       text="Settings"

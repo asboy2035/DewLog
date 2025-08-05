@@ -75,6 +75,8 @@
       </Grid>
     </Card>
 
+    <AboutCard />
+
     <NavBar />
   </ContentView>
 </template>
@@ -91,6 +93,7 @@
   import VStack from '@/components/layout/VStack.vue'
   import Grid from '@/components/layout/Grid.vue'
   import InteriorItem from '@/components/layout/InteriorItem.vue'
+  import AboutCard from '@/components/premade/AboutCard.vue'
 
   const hydrationStore = useHydrationStore()
   const newReminderTime = ref('08:00') // Default reminder time

@@ -13,7 +13,7 @@ export default defineConfig({
       includeAssets: ['favicon.ico', 'pwa-icon.png', 'apple-touch-icon.png', 'PageBackground.svg'],
       manifest: {
         name: 'DewLog',
-        short_name: 'ash + Vue',
+        short_name: 'DewLog',
         start_url: '/',
         display: 'standalone',
         background_color: '#121212',
