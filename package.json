@@ -1,12 +1,12 @@
 {
-  "name": "ash-vue-template",
-  "description": "ash's Vue Template!",
+  "name": "dewlog",
+  "description": "Water tracker app in Vue.",
   "author": {
     "email": "ash@asboy2035.com",
     "name": "ash",
     "url": "https://asboy2035.com/"
   },
-  "version": "0.0.1",
+  "version": "0.2.1",
   "private": false,
   "type": "module",
   "engines": {
